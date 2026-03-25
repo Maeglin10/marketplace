@@ -4,54 +4,48 @@ import { AuthToken } from '@/types';
 
 export const requireAuth = (request: NextRequest): AuthToken | null => {
   const token = extractTokenFromHeader(request.headers.get('authorization') ?? undefined);
-  
-  if (!token) {
-    return null;
-  }
-
+  if (!token) return null;
   return verifyToken(token);
 };
 
 export const requireRole = (request: NextRequest, allowedRoles: string[]): AuthToken | null => {
   const auth = requireAuth(request);
-  
-  if (!auth || !allowedRoles.includes(auth.role)) {
-    return null;
-  }
-
+  if (!auth || !allowedRoles.includes(auth.role)) return null;
   return auth;
 };
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  // Public routes
-  if (pathname.startsWith('/auth') || pathname === '/') {
+  // Pages : laissées au client (useAuth gère les redirections côté navigateur)
+  if (!pathname.startsWith('/api')) {
     return NextResponse.next();
   }
 
-  // Protected routes - check auth
+  // Routes API publiques — pas besoin de token
+  if (
+    pathname.startsWith('/api/auth') ||
+    pathname.startsWith('/api/services') ||
+    pathname.startsWith('/api/categories') ||
+    pathname.startsWith('/api/webhooks')
+  ) {
+    return NextResponse.next();
+  }
+
+  // Routes API protégées — token requis dans Authorization header
   const token = extractTokenFromHeader(request.headers.get('authorization') ?? undefined);
   if (!token) {
-    return NextResponse.redirect(new URL('/auth/login', request.url));
+    return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
   }
 
   const auth = verifyToken(token);
   if (!auth) {
-    return NextResponse.redirect(new URL('/auth/login', request.url));
+    return NextResponse.json({ success: false, error: 'Invalid token' }, { status: 401 });
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    '/((?!_next/static|_next/image|favicon.ico).*)',
-  ],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };
