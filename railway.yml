@@ -1,0 +1,33 @@
+name: Service Marketplace
+services:
+  web:
+    builds:
+      - path: .
+        dockerfile: Dockerfile
+    start: npm start
+    envs:
+      - key: DATABASE_URL
+        description: PostgreSQL connection string
+      - key: NEXTAUTH_SECRET
+        description: NextAuth secret key
+      - key: JWT_SECRET
+        description: JWT signing secret
+      - key: STRIPE_SECRET_KEY
+        description: Stripe secret API key
+      - key: STRIPE_WEBHOOK_SECRET
+        description: Stripe webhook signing secret
+
+  postgres:
+    image: postgres:15-alpine
+    envs:
+      - key: POSTGRES_DB
+        value: marketplace
+      - key: POSTGRES_USER
+        value: marketplace
+      - key: POSTGRES_PASSWORD
+        description: Postgres password
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data: {}
