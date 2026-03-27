@@ -8,12 +8,52 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 
+interface AnalyticsData {
+  ordersByStatus: { status: string; count: number }[];
+  revenueByMonth: { month: string; revenue: number }[];
+  totalRevenue: number;
+  services: { active: number; inactive: number };
+  reviews: { averageRating: number; count: number };
+  topServices: { service: { id: string; title: string; price: number; images: string[] } | undefined; orderCount: number }[];
+  completionRate: number;
+}
+
+function RevenueChart({ data }: { data: { month: string; revenue: number }[] }) {
+  const maxRevenue = Math.max(...data.map((d) => d.revenue), 1);
+
+  const formatMonth = (key: string) => {
+    const [year, month] = key.split('-');
+    const date = new Date(Number(year), Number(month) - 1);
+    return date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+  };
+
+  return (
+    <div className="space-y-2">
+      {data.map((item) => (
+        <div key={item.month} className="flex items-center gap-3 text-sm">
+          <span className="w-16 text-gray-500 text-xs shrink-0">{formatMonth(item.month)}</span>
+          <div className="flex-1 bg-gray-100 rounded-full h-5 relative overflow-hidden">
+            <div
+              className="h-full bg-black rounded-full transition-all duration-500"
+              style={{ width: `${(item.revenue / maxRevenue) * 100}%` }}
+            />
+          </div>
+          <span className="w-20 text-right font-medium text-xs">
+            ${item.revenue.toFixed(0)}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const { user, token, loading: authLoading } = useAuth();
   const [orders, setOrders] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);
   const [earnings, setEarnings] = useState<any>(null);
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
 
@@ -42,13 +82,19 @@ export default function DashboardPage() {
             headers: { Authorization: `Bearer ${token}` },
           }).then((r) => r.json())
         );
+        requests.push(
+          fetch('/api/seller/analytics', {
+            headers: { Authorization: `Bearer ${token}` },
+          }).then((r) => r.json())
+        );
       }
 
-      const [ordersData, servicesData, earningsData] = await Promise.all(requests);
+      const [ordersData, servicesData, earningsData, analyticsData] = await Promise.all(requests);
 
       if (ordersData?.success) setOrders(ordersData.data.orders);
       if (servicesData?.success) setServices(servicesData.data.services);
       if (earningsData?.success) setEarnings(earningsData.data);
+      if (analyticsData?.success) setAnalytics(analyticsData.data);
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
     } finally {
@@ -71,7 +117,10 @@ export default function DashboardPage() {
     { id: 'overview', label: 'Overview' },
     { id: 'orders', label: 'Orders' },
     ...(user?.role === 'SELLER' || user?.role === 'ADMIN'
-      ? [{ id: 'services', label: 'My Services' }]
+      ? [
+          { id: 'services', label: 'My Services' },
+          { id: 'analytics', label: 'Analytics' },
+        ]
       : []),
   ];
 
@@ -298,6 +347,155 @@ export default function DashboardPage() {
                   </Card>
                 ))}
               </div>
+            )}
+          </div>
+        )}
+
+        {/* Analytics Tab (sellers only) */}
+        {activeTab === 'analytics' && (
+          <div className="space-y-8">
+            {!analytics ? (
+              <p className="text-gray-500 text-sm">Loading analytics...</p>
+            ) : (
+              <>
+                {/* KPI Cards */}
+                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-sm text-gray-500 font-medium">Total Revenue</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-3xl font-bold">${analytics.totalRevenue.toFixed(2)}</p>
+                      <p className="text-xs text-gray-400 mt-1">last 6 months</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-sm text-gray-500 font-medium">Completion Rate</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-3xl font-bold">{analytics.completionRate}%</p>
+                      <p className="text-xs text-gray-400 mt-1">excl. cancelled</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-sm text-gray-500 font-medium">Average Rating</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-3xl font-bold">
+                        {analytics.reviews.averageRating > 0
+                          ? analytics.reviews.averageRating.toFixed(1)
+                          : '--'}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        {analytics.reviews.count} review{analytics.reviews.count !== 1 ? 's' : ''}
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-sm text-gray-500 font-medium">Active Services</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-3xl font-bold">{analytics.services.active}</p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        {analytics.services.inactive} inactive
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Revenue Chart */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Revenue — Last 6 Months</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {analytics.revenueByMonth.every((m) => m.revenue === 0) ? (
+                      <p className="text-gray-400 text-sm text-center py-6">
+                        No completed orders in this period
+                      </p>
+                    ) : (
+                      <RevenueChart data={analytics.revenueByMonth} />
+                    )}
+                  </CardContent>
+                </Card>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* Top 3 Services */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Top Services</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {analytics.topServices.length === 0 ? (
+                        <p className="text-gray-400 text-sm">No orders yet</p>
+                      ) : (
+                        <ol className="space-y-3">
+                          {analytics.topServices.map((item, idx) => (
+                            <li key={idx} className="flex items-center gap-3">
+                              <span className="w-6 h-6 rounded-full bg-black text-white text-xs flex items-center justify-center font-bold shrink-0">
+                                {idx + 1}
+                              </span>
+                              {item.service ? (
+                                <div className="flex-1 min-w-0">
+                                  <Link href={`/services/${item.service.id}`} className="hover:underline">
+                                    <p className="font-medium text-sm truncate">{item.service.title}</p>
+                                  </Link>
+                                  <p className="text-xs text-gray-400">
+                                    {item.orderCount} order{item.orderCount !== 1 ? 's' : ''} · ${item.service.price}
+                                  </p>
+                                </div>
+                              ) : (
+                                <p className="text-sm text-gray-400">Service deleted</p>
+                              )}
+                            </li>
+                          ))}
+                        </ol>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  {/* Orders by Status */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Orders by Status</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {analytics.ordersByStatus.length === 0 ? (
+                        <p className="text-gray-400 text-sm">No orders yet</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {analytics.ordersByStatus.map((item) => (
+                            <div key={item.status} className="flex items-center justify-between text-sm">
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                  item.status === 'COMPLETED'
+                                    ? 'bg-green-100 text-green-700'
+                                    : item.status === 'IN_PROGRESS'
+                                    ? 'bg-blue-100 text-blue-700'
+                                    : item.status === 'PAID'
+                                    ? 'bg-purple-100 text-purple-700'
+                                    : item.status === 'PENDING'
+                                    ? 'bg-yellow-100 text-yellow-700'
+                                    : 'bg-gray-100 text-gray-700'
+                                }`}
+                              >
+                                {item.status}
+                              </span>
+                              <span className="font-semibold">{item.count}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              </>
             )}
           </div>
         )}

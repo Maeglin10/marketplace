@@ -15,6 +15,9 @@ export default function ServiceDetailPage() {
   const [loading, setLoading] = useState(true);
   const [contactLoading, setContactLoading] = useState(false);
   const [reviews, setReviews] = useState<any[]>([]);
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
+  const [replyLoading, setReplyLoading] = useState(false);
 
   useEffect(() => {
     fetchService();
@@ -66,6 +69,37 @@ export default function ServiceDetailPage() {
       console.error('Failed to start conversation:', error);
     } finally {
       setContactLoading(false);
+    }
+  };
+
+  const handleSubmitReply = async (reviewId: string) => {
+    if (!replyText.trim()) return;
+    setReplyLoading(true);
+    try {
+      const res = await fetch(`/api/reviews/${reviewId}/response`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ response: replyText }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setReviews((prev) =>
+          prev.map((r) =>
+            r.id === reviewId
+              ? { ...r, sellerResponse: replyText, sellerResponseAt: new Date().toISOString() }
+              : r
+          )
+        );
+        setReplyingTo(null);
+        setReplyText('');
+      }
+    } catch (error) {
+      console.error('Failed to submit reply:', error);
+    } finally {
+      setReplyLoading(false);
     }
   };
 
@@ -149,20 +183,87 @@ export default function ServiceDetailPage() {
               <CardHeader>
                 <CardTitle>Reviews ({reviews.length})</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
                 {reviews.length === 0 ? (
                   <p className="text-gray-500 text-sm">No reviews yet</p>
                 ) : (
                   reviews.map((review: any) => (
-                    <div key={review.id} className="border-b pb-4 last:border-b-0">
+                    <div key={review.id} className="border-b pb-5 last:border-b-0">
+                      {/* Reviewer info + rating */}
                       <div className="flex items-center gap-2 mb-1">
                         <p className="font-semibold text-sm">{review.reviewer.name}</p>
                         <span className="text-yellow-500 text-sm">
                           {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
                         </span>
+                        <span className="text-xs text-gray-400 ml-auto">
+                          {new Date(review.createdAt).toLocaleDateString()}
+                        </span>
                       </div>
+
+                      {/* Review comment */}
                       {review.comment && (
                         <p className="text-gray-700 text-sm">{review.comment}</p>
+                      )}
+
+                      {/* Seller response (if exists) */}
+                      {review.sellerResponse && (
+                        <div className="mt-3 ml-4 pl-3 border-l-2 border-gray-200 bg-gray-50 rounded-r-lg py-2 pr-3">
+                          <p className="text-xs font-semibold text-gray-600 mb-1">
+                            Seller&apos;s response
+                            {review.sellerResponseAt && (
+                              <span className="font-normal text-gray-400 ml-2">
+                                · {new Date(review.sellerResponseAt).toLocaleDateString()}
+                              </span>
+                            )}
+                          </p>
+                          <p className="text-sm text-gray-700">{review.sellerResponse}</p>
+                        </div>
+                      )}
+
+                      {/* Reply button / textarea (seller only, no existing response) */}
+                      {isOwnService && !review.sellerResponse && (
+                        <div className="mt-3">
+                          {replyingTo === review.id ? (
+                            <div className="space-y-2">
+                              <textarea
+                                value={replyText}
+                                onChange={(e) => setReplyText(e.target.value)}
+                                placeholder="Write your response..."
+                                rows={3}
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-black"
+                              />
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleSubmitReply(review.id)}
+                                  disabled={replyLoading || !replyText.trim()}
+                                >
+                                  {replyLoading ? 'Saving...' : 'Submit response'}
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => {
+                                    setReplyingTo(null);
+                                    setReplyText('');
+                                  }}
+                                >
+                                  Cancel
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                setReplyingTo(review.id);
+                                setReplyText('');
+                              }}
+                              className="text-xs text-gray-500 hover:text-black underline transition-colors"
+                            >
+                              Reply to this review
+                            </button>
+                          )}
+                        </div>
                       )}
                     </div>
                   ))
