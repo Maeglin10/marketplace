@@ -4,7 +4,18 @@ import { useEffect, useState } from 'react';
 import { Navbar } from '@/components/Navbar';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Form';
+import { ServiceCardSkeleton } from '@/components/ServiceCardSkeleton';
 import Link from 'next/link';
+
+type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'rating';
+
+const SORT_OPTIONS: { value: SortOption | ''; label: string }[] = [
+  { value: '', label: 'Pertinence' },
+  { value: 'price-asc', label: 'Prix croissant' },
+  { value: 'price-desc', label: 'Prix décroissant' },
+  { value: 'rating', label: 'Les mieux notés' },
+  { value: 'newest', label: 'Plus récents' },
+];
 
 export default function ServicesPage() {
   const [services, setServices] = useState([]);
@@ -12,12 +23,16 @@ export default function ServicesPage() {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [priceRange, setPriceRange] = useState([0, 5000]);
+  const [sort, setSort] = useState<SortOption | ''>('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchCategories();
+  }, []);
+
+  useEffect(() => {
     fetchServices();
-  }, [search, selectedCategory, priceRange]);
+  }, [search, selectedCategory, priceRange, sort]);
 
   const fetchCategories = async () => {
     try {
@@ -38,6 +53,7 @@ export default function ServicesPage() {
         ...(search && { search }),
         ...(selectedCategory && { category: selectedCategory }),
         ...(priceRange && { priceMin: priceRange[0].toString(), priceMax: priceRange[1].toString() }),
+        ...(sort && { sort }),
         page: '1',
         limit: '20',
       });
@@ -57,7 +73,7 @@ export default function ServicesPage() {
   return (
     <main>
       <Navbar />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <h1 className="text-3xl font-bold mb-8">Browse Services</h1>
 
@@ -126,9 +142,30 @@ export default function ServicesPage() {
 
           {/* Services Grid */}
           <div className="md:col-span-3">
+            {/* Sort bar */}
+            <div className="flex items-center justify-end mb-4">
+              <label htmlFor="sort-select" className="text-sm text-gray-600 mr-2">
+                Trier par :
+              </label>
+              <select
+                id="sort-select"
+                value={sort}
+                onChange={(e) => setSort(e.target.value as SortOption | '')}
+                className="border border-gray-300 rounded-md px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-gray-300"
+              >
+                {SORT_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             {loading ? (
-              <div className="text-center py-12">
-                <p className="text-gray-600">Loading services...</p>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <ServiceCardSkeleton key={i} />
+                ))}
               </div>
             ) : services.length === 0 ? (
               <div className="text-center py-12">
@@ -151,7 +188,7 @@ export default function ServicesPage() {
                       <CardContent className="pt-4">
                         <h3 className="font-semibold text-lg mb-2 line-clamp-2">{service.title}</h3>
                         <p className="text-sm text-gray-600 mb-4 line-clamp-2">{service.description}</p>
-                        
+
                         <div className="flex items-center justify-between">
                           <span className="text-2xl font-bold">${service.price}</span>
                           <div className="text-sm text-gray-600">

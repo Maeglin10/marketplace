@@ -133,6 +133,7 @@ export const serviceService = {
     if (sortBy === 'price-asc') orderBy = { price: 'asc' };
     if (sortBy === 'price-desc') orderBy = { price: 'desc' };
     if (sortBy === 'newest') orderBy = { createdAt: 'desc' };
+    if (sortBy === 'rating') orderBy = { reviews: { _count: 'desc' } };
 
     const [services, total] = await Promise.all([
       prisma.service.findMany({
@@ -149,6 +150,9 @@ export const serviceService = {
             },
           },
           category: true,
+          _count: {
+            select: { reviews: true },
+          },
         },
       }),
       prisma.service.count({ where }),

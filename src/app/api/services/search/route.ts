@@ -8,7 +8,8 @@ export async function GET(request: NextRequest) {
     
     const search = query.get('search') || undefined;
     const category = query.get('category') || undefined;
-    const sortBy = query.get('sortBy') as any || 'newest';
+    // Accept both `sort` (new) and `sortBy` (legacy) query params
+    const sortBy = (query.get('sort') || query.get('sortBy') || 'newest') as string;
     const page = parseInt(query.get('page') || '1', 10);
     const limit = parseInt(query.get('limit') || '10', 10);
     
