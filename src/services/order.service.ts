@@ -69,6 +69,17 @@ export const orderService = {
             },
           },
         },
+        dispute: {
+          select: {
+            id: true,
+            reason: true,
+            description: true,
+            status: true,
+            resolution: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
       },
     });
   },
