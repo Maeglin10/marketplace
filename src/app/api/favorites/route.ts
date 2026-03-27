@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { successResponse, errorResponse, unauthorizedResponse } from '@/lib/response';
-import { prisma } from '@/lib/db';
+import prisma from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   try {
