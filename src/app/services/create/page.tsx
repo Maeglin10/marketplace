@@ -6,6 +6,8 @@ import { Navbar } from '@/components/Navbar';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Input, TextArea, Label } from '@/components/ui/Form';
+import { UploadButton } from '@uploadthing/react';
+import type { OurFileRouter } from '@/app/api/uploadthing/core';
 
 export default function CreateServicePage() {
   const router = useRouter();
@@ -71,6 +73,16 @@ export default function CreateServicePage() {
 
   const removeImageField = (index: number) => {
     setImages(images.filter((_, i) => i !== index));
+  };
+
+  const handleUploadComplete = (res: { url: string }[]) => {
+    const urls = res.map((file) => file.url);
+    setImages((prev) => {
+      // Remplacer les entrées vides d'abord, puis ajouter le reste
+      const existing = prev.filter((img) => img.trim() !== '');
+      const combined = [...existing, ...urls].slice(0, 5);
+      return combined;
+    });
   };
 
   useEffect(() => {
@@ -168,30 +180,82 @@ export default function CreateServicePage() {
                   <Label>Images</Label>
                   {images.length < 5 && (
                     <Button type="button" variant="outline" size="sm" onClick={addImageField}>
-                      + Add Image
+                      + Add URL
                     </Button>
                   )}
                 </div>
 
-                {images.map((image, index) => (
-                  <div key={index} className="flex gap-2">
-                    <Input
-                      placeholder="Image URL"
-                      value={image}
-                      onChange={(e) => handleImageChange(index, e.target.value)}
+                {/* Upload via uploadthing */}
+                {images.length < 5 && (
+                  <div className="border-2 border-dashed border-gray-200 rounded-lg p-4 text-center">
+                    <UploadButton<OurFileRouter, 'serviceImage'>
+                      endpoint="serviceImage"
+                      onClientUploadComplete={handleUploadComplete}
+                      onUploadError={(error) => setError(`Erreur upload : ${error.message}`)}
+                      appearance={{
+                        button: 'bg-gray-900 text-white text-sm px-4 py-2 rounded-md hover:bg-gray-700',
+                        allowedContent: 'text-xs text-gray-400 mt-1',
+                      }}
                     />
-                    {images.length > 1 && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => removeImageField(index)}
-                      >
-                        Remove
-                      </Button>
-                    )}
+                    <p className="text-xs text-gray-400 mt-2">JPG, PNG, WebP — max 4 Mo — jusqu&apos;a 5 images</p>
                   </div>
-                ))}
+                )}
+
+                {/* Apercu des images uploadées / URLs saisies */}
+                {images.filter((img) => img.trim()).length > 0 && (
+                  <div className="space-y-2">
+                    {images.map((image, index) => (
+                      image.trim() && (
+                        <div key={index} className="flex gap-2 items-center">
+                          <img
+                            src={image}
+                            alt={`Image ${index + 1}`}
+                            className="w-16 h-16 object-cover rounded border border-gray-200"
+                            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                          />
+                          <Input
+                            placeholder="URL de l'image"
+                            value={image}
+                            onChange={(e) => handleImageChange(index, e.target.value)}
+                            className="flex-1"
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeImageField(index)}
+                          >
+                            Supprimer
+                          </Button>
+                        </div>
+                      )
+                    ))}
+                  </div>
+                )}
+
+                {/* Champs URL vides (saisis manuellement) */}
+                {images.filter((img) => !img.trim()).map((_, idx) => {
+                  const realIndex = images.findIndex((img, i) => !img.trim() && images.indexOf(img) === i);
+                  return (
+                    <div key={`empty-${idx}`} className="flex gap-2">
+                      <Input
+                        placeholder="URL de l'image (optionnel)"
+                        value=""
+                        onChange={(e) => handleImageChange(realIndex, e.target.value)}
+                      />
+                      {images.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => removeImageField(realIndex)}
+                        >
+                          Supprimer
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
 
               <div className="flex gap-4">

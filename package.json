@@ -14,8 +14,11 @@
   },
   "dependencies": {
     "@prisma/client": "^5.8.0",
+    "@react-email/components": "^1.0.10",
+    "@react-email/render": "^2.0.4",
     "@stripe/react-stripe-js": "^2.4.0",
     "@stripe/stripe-js": "^3.0.0",
+    "@uploadthing/react": "^7.3.3",
     "axios": "^1.6.5",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.0",
@@ -26,9 +29,11 @@
     "next-themes": "^0.2.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "resend": "^6.9.4",
     "stripe": "^14.10.0",
     "tailwind-merge": "^2.2.1",
     "tailwindcss": "^3.4.1",
+    "uploadthing": "^7.7.4",
     "ws": "^8.15.0",
     "zod": "^3.22.4"
   },
