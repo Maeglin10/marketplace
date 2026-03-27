@@ -3,6 +3,7 @@ import { orderService } from '@/services/order.service';
 import { successResponse, errorResponse, unauthorizedResponse, validationErrorResponse } from '@/lib/response';
 import { requireAuth } from '@/lib/auth';
 import { createNotification } from '@/lib/notifications';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { z } from 'zod';
 import { sendEmail } from '@/lib/email';
 import { OrderConfirmationEmail } from '@/emails/order-confirmation';
@@ -20,6 +21,13 @@ const createOrderSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  // Rate limit: max 20 order creations per minute per IP
+  const ip = getClientIp(request);
+  const rl = await rateLimit(`orders:create:${ip}`, { limit: 20, windowMs: 60_000 });
+  if (!rl.allowed) {
+    return errorResponse('Too many requests, please try again later', 429);
+  }
+
   try {
     const auth = requireAuth(request);
     if (!auth) {

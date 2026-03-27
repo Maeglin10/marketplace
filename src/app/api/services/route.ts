@@ -4,6 +4,12 @@ import { serviceService } from '@/services/service.service';
 import { successResponse, errorResponse, validationErrorResponse, unauthorizedResponse } from '@/lib/response';
 import { requireAuth } from '@/lib/auth';
 
+/** Supprime les balises HTML et normalise les espaces blancs */
+function sanitizeText(value: unknown): unknown {
+  if (typeof value !== 'string') return value;
+  return value.replace(/[<>]/g, '').trim();
+}
+
 export async function POST(request: NextRequest) {
   try {
     const auth = requireAuth(request);
@@ -11,7 +17,13 @@ export async function POST(request: NextRequest) {
       return unauthorizedResponse();
     }
 
-    const body = await request.json();
+    const raw = await request.json();
+    // Sanitiser les champs texte libres avant validation
+    const body = {
+      ...raw,
+      title: sanitizeText(raw.title),
+      description: sanitizeText(raw.description),
+    };
     const validation = createServiceSchema.safeParse(body);
     if (!validation.success) {
       return validationErrorResponse(

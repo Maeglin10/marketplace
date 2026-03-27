@@ -3,6 +3,7 @@ import { requireAuth } from '@/lib/auth';
 import { orderService } from '@/services/order.service';
 import { stripeService } from '@/services/stripe.service';
 import { successResponse, errorResponse, unauthorizedResponse } from '@/lib/response';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { z } from 'zod';
 
 const schema = z.object({
@@ -12,6 +13,13 @@ const schema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  // Rate limit: max 10 payment intent creations per minute per IP
+  const ip = getClientIp(request);
+  const rl = await rateLimit(`payment:create-intent:${ip}`, { limit: 10, windowMs: 60_000 });
+  if (!rl.allowed) {
+    return errorResponse('Too many requests, please try again later', 429);
+  }
+
   try {
     const auth = requireAuth(request);
     if (!auth) return unauthorizedResponse();

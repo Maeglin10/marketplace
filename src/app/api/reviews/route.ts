@@ -4,6 +4,12 @@ import { createReviewSchema } from '@/lib/validation';
 import { successResponse, errorResponse, unauthorizedResponse, validationErrorResponse } from '@/lib/response';
 import { requireAuth } from '@/lib/auth';
 
+/** Supprime les balises HTML et normalise les espaces blancs */
+function sanitizeText(value: unknown): unknown {
+  if (typeof value !== 'string') return value;
+  return value.replace(/[<>]/g, '').trim();
+}
+
 export async function POST(request: NextRequest) {
   try {
     const auth = requireAuth(request);
@@ -11,7 +17,12 @@ export async function POST(request: NextRequest) {
       return unauthorizedResponse();
     }
 
-    const body = await request.json();
+    const raw = await request.json();
+    // Sanitiser le champ texte libre avant validation
+    const body = {
+      ...raw,
+      comment: sanitizeText(raw.comment),
+    };
     const validation = createReviewSchema.safeParse(body);
     if (!validation.success) {
       return validationErrorResponse(
