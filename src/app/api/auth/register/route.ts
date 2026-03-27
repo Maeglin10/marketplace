@@ -3,8 +3,16 @@ import { registerSchema } from '@/lib/validation';
 import { userService } from '@/services/user.service';
 import { createToken } from '@/lib/auth';
 import { successResponse, errorResponse, validationErrorResponse } from '@/lib/response';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
+  // Rate limit: max 10 requests per minute per IP
+  const ip = getClientIp(request);
+  const rl = rateLimit(`auth:register:${ip}`, { limit: 10, windowMs: 60_000 });
+  if (!rl.allowed) {
+    return errorResponse('Too many requests, please try again later', 429);
+  }
+
   try {
     const body = await request.json();
 
