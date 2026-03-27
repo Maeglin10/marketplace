@@ -1,0 +1,139 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/test
+          JWT_SECRET: ci-test-secret-key-32chars-minimum
+          STRIPE_SECRET_KEY: sk_test_placeholder
+          STRIPE_WEBHOOK_SECRET: whsec_placeholder
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_placeholder
+          UPLOADTHING_TOKEN: placeholder
+          RESEND_API_KEY: re_placeholder
+          EMAIL_FROM: test@test.com
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+
+  typecheck:
+    name: Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/test
+
+      - name: Run TypeScript type check
+        run: npx tsc --noEmit
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/test
+          JWT_SECRET: ci-test-secret-key-32chars-minimum
+          STRIPE_SECRET_KEY: sk_test_placeholder
+          STRIPE_WEBHOOK_SECRET: whsec_placeholder
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_placeholder
+          UPLOADTHING_TOKEN: placeholder
+          RESEND_API_KEY: re_placeholder
+          EMAIL_FROM: test@test.com
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/test
+
+      - name: Run tests
+        run: npm run test:run
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/test
+          JWT_SECRET: ci-test-secret-key-32chars-minimum
+          STRIPE_SECRET_KEY: sk_test_placeholder
+          STRIPE_WEBHOOK_SECRET: whsec_placeholder
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_placeholder
+          UPLOADTHING_TOKEN: placeholder
+          RESEND_API_KEY: re_placeholder
+          EMAIL_FROM: test@test.com
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/test
+
+      - name: Build Next.js application
+        run: npm run build
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/test
+          JWT_SECRET: ci-test-secret-key-32chars-minimum
+          STRIPE_SECRET_KEY: sk_test_placeholder
+          STRIPE_WEBHOOK_SECRET: whsec_placeholder
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_placeholder
+          UPLOADTHING_TOKEN: placeholder
+          RESEND_API_KEY: re_placeholder
+          EMAIL_FROM: test@test.com
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          SENTRY_DSN: ""
+          SENTRY_AUTH_TOKEN: ""
+          # Disable Sentry source map upload in CI build
+          SENTRY_SUPPRESS_TURBOPACK_WARNING: "1"

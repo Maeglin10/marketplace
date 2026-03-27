@@ -6,6 +6,7 @@ import { createNotification } from '@/lib/notifications';
 import { updateOrderStatusSchema } from '@/lib/validation';
 import { sendEmail } from '@/lib/email';
 import { OrderStatusUpdateEmail } from '@/emails/order-status-update';
+import { captureException } from '@/lib/sentry';
 import prisma from '@/lib/db';
 
 export async function GET(
@@ -95,7 +96,10 @@ export async function PUT(
           });
         }
       } catch (emailError) {
-        console.error('[email] Échec envoi mise à jour statut commande:', emailError);
+        captureException(emailError, {
+          tags: { component: 'email', event: 'order-status-update' },
+          extra: { orderId: id, status: validation.data.status },
+        });
       }
     }
 
