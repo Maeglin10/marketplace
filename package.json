@@ -23,6 +23,8 @@
     "@stripe/react-stripe-js": "^2.4.0",
     "@stripe/stripe-js": "^3.0.0",
     "@uploadthing/react": "^7.3.3",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.37.0",
     "axios": "^1.6.5",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.0",

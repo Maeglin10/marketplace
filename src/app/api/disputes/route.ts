@@ -10,6 +10,12 @@ import {
 } from '@/lib/response';
 import { z } from 'zod';
 
+/** Supprime les balises HTML et normalise les espaces blancs */
+function sanitizeText(value: unknown): unknown {
+  if (typeof value !== 'string') return value;
+  return value.replace(/[<>]/g, '').trim();
+}
+
 const openDisputeSchema = z.object({
   orderId: z.string().min(1, 'Order ID is required'),
   reason: z.string().min(3, 'Reason must be at least 3 characters'),
@@ -24,7 +30,13 @@ export async function POST(request: NextRequest) {
       return unauthorizedResponse();
     }
 
-    const body = await request.json();
+    const raw = await request.json();
+    // Sanitiser les champs texte libres avant validation
+    const body = {
+      ...raw,
+      reason: sanitizeText(raw.reason),
+      description: sanitizeText(raw.description),
+    };
     const validation = openDisputeSchema.safeParse(body);
     if (!validation.success) {
       return validationErrorResponse(validation.error.flatten().fieldErrors as any);
