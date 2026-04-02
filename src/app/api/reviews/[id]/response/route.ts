@@ -11,7 +11,7 @@ import { requireAuth } from '@/lib/auth';
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = requireAuth(request);
@@ -19,7 +19,7 @@ export async function PATCH(
       return unauthorizedResponse();
     }
 
-    const { id: reviewId } = params;
+    const { id: reviewId } = await params;
     const body = await request.json();
     const { response } = body;
 

@@ -69,7 +69,7 @@ if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) 
       };
     };
   } catch (err) {
-    console.warn('[rate-limit] Impossible d'initialiser Upstash — fallback in-memory', err);
+    console.warn("[rate-limit] Impossible d'initialiser Upstash — fallback in-memory", err);
   }
 }
 

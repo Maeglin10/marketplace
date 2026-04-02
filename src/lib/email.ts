@@ -2,7 +2,6 @@ import { Resend } from 'resend';
 import { render } from '@react-email/render';
 import { createElement } from 'react';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = process.env.EMAIL_FROM || 'Marketplace <noreply@marketplace.com>';
 
 interface SendEmailOptions {
@@ -15,6 +14,7 @@ interface SendEmailOptions {
 }
 
 export async function sendEmail({ to, subject, template, props }: SendEmailOptions): Promise<void> {
+  const resend = new Resend(process.env.RESEND_API_KEY);
   const html = await render(createElement(template, props));
 
   await resend.emails.send({

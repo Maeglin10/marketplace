@@ -104,6 +104,6 @@ export type SearchParams = {
   search?: string;
   category?: string;
   priceRange?: [number, number];
-  sortBy?: 'newest' | 'popular' | 'price-asc' | 'price-desc';
+  sortBy?: 'newest' | 'popular' | 'price-asc' | 'price-desc' | 'rating';
   pagination: PaginationParams;
 };

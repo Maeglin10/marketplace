@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
       search,
       category,
       priceRange: priceRange as any,
-      sortBy,
+      sortBy: sortBy as any,
       pagination: { page, limit },
     });
 
