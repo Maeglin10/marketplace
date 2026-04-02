@@ -2,6 +2,7 @@ import { Navbar } from '@/components/Navbar';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
 import { APP_CONFIG } from '@/config/app';
+import { Shield, MessageCircle, Star } from 'lucide-react';
 
 const featuredServices = [
   {
@@ -45,36 +46,38 @@ const stats = [
 
 export default function Home() {
   return (
-    <main>
+    <main className="min-h-screen bg-white dark:bg-gray-900">
       <Navbar />
 
       {/* Hero */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-        <div className="text-center space-y-8">
-          <h1 className="text-5xl md:text-6xl font-bold tracking-tight animate-fade-in">
-            {APP_CONFIG.tagline}
-          </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto animate-fade-in animation-delay-150">
-            Connect with talented service providers or offer your expertise to a global audience.
-            Our secure marketplace makes it easy to find, hire, and deliver quality services.
-          </p>
-          <p className="text-base text-gray-500 dark:text-gray-500 max-w-xl mx-auto animate-slide-up animation-delay-300">
-            Trusted by thousands of buyers and sellers worldwide — get started today.
-          </p>
+      <section className="relative overflow-hidden bg-gradient-to-br from-white via-gray-50 to-gray-100 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center space-y-8">
+            <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-gray-900 dark:text-gray-100 animate-fade-in">
+              {APP_CONFIG.tagline}
+            </h1>
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto animate-fade-in animation-delay-150">
+              Connect with talented service providers or offer your expertise to a global audience.
+              Our secure marketplace makes it easy to find, hire, and deliver quality services.
+            </p>
+            <p className="text-base text-gray-500 dark:text-gray-500 max-w-xl mx-auto animate-slide-up animation-delay-300">
+              Trusted by thousands of buyers and sellers worldwide — get started today.
+            </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up animation-delay-450">
-            <Link href="/services">
-              <Button size="lg">Browse Services</Button>
-            </Link>
-            <Link href="/auth/register">
-              <Button variant="outline" size="lg">Start Selling</Button>
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up animation-delay-450">
+              <Link href="/services">
+                <Button size="lg">Browse Services</Button>
+              </Link>
+              <Link href="/auth/register">
+                <Button variant="outline" size="lg">Start Selling</Button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Stats */}
-      <section className="bg-black text-white py-12">
+      <section className="bg-black dark:bg-gray-950 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {stats.map((stat) => (
@@ -88,36 +91,36 @@ export default function Home() {
       </section>
 
       {/* Features */}
-      <section className="bg-gray-50 dark:bg-gray-900 py-16">
+      <section className="bg-gray-50 dark:bg-gray-800 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold mb-12 text-center">Why {APP_CONFIG.name}?</h2>
+          <h2 className="text-3xl font-bold mb-12 text-center text-gray-900 dark:text-gray-100">Why {APP_CONFIG.name}?</h2>
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                icon: '🔒',
+                icon: <Shield size={22} />,
                 title: 'Secure Payments',
                 desc: 'Protected transactions via Stripe Connect. Funds are held securely until work is delivered. Supports cards, Apple Pay, Google Pay, SEPA & more.',
               },
               {
-                icon: '💬',
+                icon: <MessageCircle size={22} />,
                 title: 'Real-time Chat',
                 desc: 'Communicate instantly with buyers or sellers. Live messaging with no page refresh — always stay connected.',
               },
               {
-                icon: '⭐',
+                icon: <Star size={22} />,
                 title: 'Ratings & Reviews',
                 desc: 'Build your reputation with verified reviews from completed orders. Earn trust from the community.',
               },
             ].map((feature) => (
               <div
                 key={feature.title}
-                className="space-y-4 p-6 rounded-xl bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md hover:-translate-y-1 transition-all duration-200"
+                className="space-y-4 p-6 rounded-xl bg-white dark:bg-gray-900 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md hover:-translate-y-1 transition-all duration-200"
               >
-                <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center text-white text-xl">
+                <div className="w-12 h-12 bg-black dark:bg-white rounded-xl flex items-center justify-center text-white dark:text-black">
                   {feature.icon}
                 </div>
-                <h3 className="text-xl font-semibold">{feature.title}</h3>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{feature.title}</h3>
                 <p className="text-gray-600 dark:text-gray-400">{feature.desc}</p>
               </div>
             ))}
@@ -126,10 +129,10 @@ export default function Home() {
       </section>
 
       {/* Featured Services */}
-      <section className="py-16">
+      <section className="py-16 bg-white dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-12">
-            <h2 className="text-3xl font-bold">Featured Services</h2>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Featured Services</h2>
             <Link href="/services" className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">
               View all →
             </Link>
@@ -170,9 +173,9 @@ export default function Home() {
       </section>
 
       {/* How it works */}
-      <section className="bg-gray-50 dark:bg-gray-900 py-16">
+      <section className="bg-gray-50 dark:bg-gray-800 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold mb-12 text-center">How It Works</h2>
+          <h2 className="text-3xl font-bold mb-12 text-center text-gray-900 dark:text-gray-100">How It Works</h2>
           <div className="grid md:grid-cols-3 gap-8">
             {[
               { step: '1', title: 'Find a Service', desc: 'Browse thousands of services and filter by category, price, or rating.' },
@@ -180,10 +183,10 @@ export default function Home() {
               { step: '3', title: 'Get It Done', desc: 'Work with your seller, communicate in real-time, and release payment on completion.' },
             ].map((item) => (
               <div key={item.step} className="text-center space-y-4">
-                <div className="w-12 h-12 rounded-full border-2 border-black dark:border-white flex items-center justify-center text-xl font-bold mx-auto">
+                <div className="w-12 h-12 rounded-full border-2 border-black dark:border-gray-400 flex items-center justify-center text-xl font-bold mx-auto text-gray-900 dark:text-gray-100">
                   {item.step}
                 </div>
-                <h3 className="text-xl font-semibold">{item.title}</h3>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{item.title}</h3>
                 <p className="text-gray-600 dark:text-gray-400">{item.desc}</p>
               </div>
             ))}
@@ -218,7 +221,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-gray-900 dark:bg-black text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
@@ -253,7 +256,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="border-t border-gray-700 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-400">
+          <div className="border-t border-gray-700 dark:border-gray-800 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-400">
             <p>© {new Date().getFullYear()} {APP_CONFIG.name}. All rights reserved.</p>
             <p>Platform fee: {APP_CONFIG.commissionPercent}% per transaction</p>
           </div>

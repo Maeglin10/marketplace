@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useAuth } from '@/contexts/AuthContext';
 import { APP_CONFIG } from '@/config/app';
 
@@ -13,48 +14,50 @@ export function Navbar() {
 
   return (
     <>
-      <nav className="border-b border-gray-200 sticky top-0 bg-white z-50">
+      <nav className="border-b border-gray-200 dark:border-gray-800 sticky top-0 bg-white dark:bg-gray-950 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link href="/" className="text-2xl font-bold">
+            <Link href="/" className="text-2xl font-bold dark:text-white">
               {APP_CONFIG.name}
             </Link>
 
             <div className="hidden md:flex items-center space-x-6">
-              <Link href="/services" className="text-gray-600 hover:text-black">
+              <Link href="/services" className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white">
                 Browse Services
               </Link>
               {user ? (
                 <>
-                  <Link href="/dashboard" className="text-gray-600 hover:text-black">
+                  <Link href="/dashboard" className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white">
                     Dashboard
                   </Link>
-                  <Link href="/favorites" className="text-gray-600 hover:text-black">
+                  <Link href="/favorites" className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white">
                     Favorites
                   </Link>
-                  <Link href="/messages" className="text-gray-600 hover:text-black">
+                  <Link href="/messages" className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white">
                     Messages
                   </Link>
-                  <Link href="/profile" className="text-gray-600 hover:text-black">
+                  <Link href="/profile" className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white">
                     Profile
                   </Link>
                   {user.role === 'ADMIN' && (
-                    <Link href="/admin" className="text-gray-600 hover:text-black font-medium">
+                    <Link href="/admin" className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white font-medium">
                       Admin
                     </Link>
                   )}
                   {user.role === 'SELLER' && (
-                    <Link href="/seller/onboard" className="text-gray-600 hover:text-black">
+                    <Link href="/seller/onboard" className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white">
                       Seller Settings
                     </Link>
                   )}
                   <NotificationCenter />
+                  <ThemeToggle />
                   <Button onClick={logout} variant="outline" size="sm">
                     Logout
                   </Button>
                 </>
               ) : (
                 <>
+                  <ThemeToggle />
                   <Link href="/auth/login">
                     <Button variant="outline" size="sm">Login</Button>
                   </Link>
@@ -107,14 +110,14 @@ export function Navbar() {
       </nav>
 
       {/* Footer légal — visible sur toutes les pages via la Navbar */}
-      <footer className="mt-auto border-t border-gray-100 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-sm text-gray-400">
+      <footer className="mt-auto border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-sm text-gray-400 dark:text-gray-500">
           <p>© {new Date().getFullYear()} {APP_CONFIG.name}. Tous droits réservés.</p>
           <div className="flex gap-6">
-            <Link href="/cgu" className="hover:text-black transition-colors">
+            <Link href="/cgu" className="hover:text-black dark:hover:text-white transition-colors">
               CGU
             </Link>
-            <Link href="/privacy" className="hover:text-black transition-colors">
+            <Link href="/privacy" className="hover:text-black dark:hover:text-white transition-colors">
               Confidentialité
             </Link>
           </div>
