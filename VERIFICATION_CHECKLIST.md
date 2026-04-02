@@ -22,9 +22,10 @@
 - [ ] `.env.example` - Environment template
 - [ ] `.gitignore` - Git exclusions
 
-### API Routes (18 total)
+### API Routes (core)
 - [ ] `/api/auth/register` - POST
 - [ ] `/api/auth/login` - POST
+- [ ] `/api/auth/logout` - POST
 - [ ] `/api/auth/me` - GET
 - [ ] `/api/services` - POST
 - [ ] `/api/services/search` - GET
@@ -41,6 +42,7 @@
 - [ ] `/api/seller/onboard` - POST
 - [ ] `/api/admin/stats` - GET
 - [ ] `/api/webhooks/stripe` - POST
+- [ ] `/api/health` - GET
 
 ### UI Components (5 total)
 - [ ] `components/ui/Button.tsx` - CVA variants
@@ -159,10 +161,9 @@
   - [ ] `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
   - [ ] `STRIPE_SECRET_KEY`
   - [ ] `STRIPE_WEBHOOK_SECRET`
-- [ ] `NEXT_PUBLIC_API_URL` documented
 
 ### Dependencies
-- [ ] `package.json` lists all 22 dependencies
+- [ ] `package.json` lists all dependencies
 - [ ] Dev dependencies listed separately
 - [ ] Scripts configured:
   - [ ] `npm run dev`
@@ -306,7 +307,7 @@ npm start
 - [x] Message sending
 - [x] Message history
 - [x] Unread tracking
-- [x] WebSocket ready
+- [x] SSE ready
 
 ### Reviews ✅
 - [x] Review creation

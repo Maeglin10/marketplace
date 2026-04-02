@@ -4,26 +4,17 @@ import { useCallback } from 'react';
 import { ApiResponse } from '@/types';
 
 export function useApi() {
-  const getToken = () => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('auth-token');
-    }
-    return null;
-  };
-
   const request = useCallback(
     async <T,>(
       endpoint: string,
       options: RequestInit = {}
     ): Promise<ApiResponse<T>> => {
-      const token = getToken();
-
       try {
         const response = await fetch(endpoint, {
           ...options,
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
-            ...(token && { Authorization: `Bearer ${token}` }),
             ...options.headers,
           },
         });
@@ -31,12 +22,8 @@ export function useApi() {
         const data = await response.json();
 
         if (!response.ok) {
-          if (response.status === 401) {
-            // Handle unauthorized
-            if (typeof window !== 'undefined') {
-              localStorage.removeItem('auth-token');
-              window.location.href = '/auth/login';
-            }
+          if (response.status === 401 && typeof window !== 'undefined') {
+            window.location.href = '/auth/login';
           }
           return {
             success: false,
@@ -55,5 +42,5 @@ export function useApi() {
     []
   );
 
-  return { request, getToken };
+  return { request };
 }

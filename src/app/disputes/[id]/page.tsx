@@ -33,9 +33,8 @@ export default function DisputeDetailPage() {
 
   const fetchDispute = async () => {
     try {
-      const token = localStorage.getItem('auth-token');
       const res = await fetch(`/api/disputes/${params.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
       });
       const data = await res.json();
       if (data.success) {

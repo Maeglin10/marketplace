@@ -4,7 +4,15 @@ import { NextRequest } from 'next/server';
 import { JWT_EXPIRY } from '@/config/constants';
 import { AuthToken } from '@/types';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-key-change-in-production';
+const JWT_SECRET =
+  process.env.JWT_SECRET ||
+  (process.env.NODE_ENV === 'production'
+    ? undefined
+    : 'dev-secret-key-change-in-production');
+
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET is required in production');
+}
 
 export const createToken = (payload: AuthToken): string => {
   return jwt.sign(payload, JWT_SECRET, {
@@ -43,11 +51,15 @@ export const extractTokenFromHeader = (authHeader?: string): string | null => {
 };
 
 export const requireAuth = (request: NextRequest): AuthToken | null => {
-  const token = extractTokenFromHeader(request.headers.get('authorization') ?? undefined);
-  
-  if (!token) {
-    return null;
-  }
+  const headerToken = extractTokenFromHeader(
+    request.headers.get('authorization') ?? undefined
+  );
+  const cookieToken = extractTokenFromCookie(
+    request.headers.get('cookie') ?? undefined
+  );
+
+  const token = headerToken || cookieToken;
+  if (!token) return null;
 
   return verifyToken(token);
 };

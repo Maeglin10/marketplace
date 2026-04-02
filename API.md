@@ -6,15 +6,17 @@
 http://localhost:3000/api
 ```
 
+> Note: This document covers the core endpoints. Additional endpoints exist for admin, notifications, disputes, and uploads.
+
 ## Authentication
 
-All endpoints requiring authentication use JWT tokens passed via the `Authorization` header:
+The app uses a **httpOnly auth cookie** for browser sessions. For external clients, you can also pass a JWT via the `Authorization` header:
 
 ```
 Authorization: Bearer <token>
 ```
 
-Tokens are obtained from login/register endpoints and stored in `localStorage`.
+Login/register set the cookie automatically. The JSON response still includes a token for API clients.
 
 ---
 
@@ -58,6 +60,18 @@ Login to existing account.
 {
   "email": "user@example.com",
   "password": "securepassword"
+}
+```
+
+### POST `/auth/logout`
+
+Clears the auth cookie.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": { "loggedOut": true }
 }
 ```
 
@@ -198,6 +212,20 @@ Delete a service. Requires authentication and ownership.
 ```
 
 ---
+
+## Utility
+
+### GET `/health`
+
+Simple health check.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": { "status": "ok" }
+}
+```
 
 ## Categories Endpoints
 

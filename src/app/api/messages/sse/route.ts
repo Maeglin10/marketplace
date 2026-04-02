@@ -1,18 +1,18 @@
 import { NextRequest } from 'next/server';
-import { verifyToken } from '@/lib/auth';
+import { verifyToken, requireAuth } from '@/lib/auth';
 import prisma from '@/lib/db';
 import { addSubscriber, removeSubscriber } from '@/lib/sse';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const token = searchParams.get('token');
   const conversationId = searchParams.get('conversationId');
 
-  if (!token || !conversationId) {
-    return new Response('Missing token or conversationId', { status: 400 });
+  if (!conversationId) {
+    return new Response('Missing conversationId', { status: 400 });
   }
 
-  const auth = verifyToken(token);
+  const token = searchParams.get('token');
+  const auth = token ? verifyToken(token) : requireAuth(request);
   if (!auth) return new Response('Unauthorized', { status: 401 });
 
   // Verify the user belongs to this conversation

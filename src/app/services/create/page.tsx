@@ -26,15 +26,14 @@ export default function CreateServicePage() {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('auth-token');
       const filteredImages = images.filter((img) => img.trim());
 
       const res = await fetch('/api/services', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           title,
           description,

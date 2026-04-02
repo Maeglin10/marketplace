@@ -11,7 +11,7 @@ import { Suspense } from 'react';
 function OnboardPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, token, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [onboarding, setOnboarding] = useState(false);
@@ -32,7 +32,7 @@ function OnboardPageInner() {
   const fetchProfile = async () => {
     try {
       const res = await fetch('/api/profile', {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
       });
       const data = await res.json();
       if (data.success) setProfile(data.data);
@@ -47,7 +47,7 @@ function OnboardPageInner() {
     try {
       const res = await fetch('/api/seller/onboard', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
       });
       const data = await res.json();
       if (data.success) {
@@ -66,7 +66,7 @@ function OnboardPageInner() {
     try {
       const res = await fetch('/api/seller/onboard', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
       });
       const data = await res.json();
       if (data.success) {

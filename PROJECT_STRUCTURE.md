@@ -7,6 +7,7 @@ marketplace/
 ├── src/
 │   ├── app/
 │   │   ├── api/                          # API routes
+│   │   │   ├── ...                        # (subset shown)
 │   │   │   ├── auth/
 │   │   │   │   ├── register/route.ts     # User registration
 │   │   │   │   ├── login/route.ts        # User login

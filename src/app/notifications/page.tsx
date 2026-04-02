@@ -66,7 +66,7 @@ function timeAgo(dateString: string): string {
 }
 
 export default function NotificationsPage() {
-  const { token } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -76,11 +76,11 @@ export default function NotificationsPage() {
 
   const fetchNotifications = useCallback(
     async (pageNum: number) => {
-      if (!token) return;
+      if (!user) return;
       setLoading(true);
       try {
         const res = await fetch(`/api/notifications?page=${pageNum}&limit=20`, {
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
         });
         if (!res.ok) return;
         const data = await res.json();
@@ -95,20 +95,20 @@ export default function NotificationsPage() {
         setLoading(false);
       }
     },
-    [token]
+    [user]
   );
 
   useEffect(() => {
-    fetchNotifications(page);
-  }, [fetchNotifications, page]);
+    if (!authLoading) fetchNotifications(page);
+  }, [fetchNotifications, page, authLoading]);
 
   async function markAllRead() {
-    if (!token) return;
+    if (!user) return;
     setMarking(true);
     try {
       await fetch('/api/notifications', {
         method: 'PATCH',
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
       });
       setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
       setUnreadCount(0);
@@ -120,11 +120,11 @@ export default function NotificationsPage() {
   }
 
   async function markOneRead(id: string) {
-    if (!token) return;
+    if (!user) return;
     try {
       await fetch(`/api/notifications/${id}`, {
         method: 'PATCH',
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
       });
       setNotifications((prev) =>
         prev.map((n) => (n.id === id ? { ...n, read: true } : n))

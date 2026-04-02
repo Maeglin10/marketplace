@@ -10,7 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, token, setUser, loading: authLoading } = useAuth();
+  const { user, setUser, loading: authLoading } = useAuth();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -30,13 +30,13 @@ export default function ProfilePage() {
   }, [user, authLoading, router]);
 
   useEffect(() => {
-    if (user && token) fetchProfile();
-  }, [user, token]);
+    if (user) fetchProfile();
+  }, [user]);
 
   const fetchProfile = async () => {
     try {
       const res = await fetch('/api/profile', {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
       });
       const data = await res.json();
       if (data.success) {
@@ -65,8 +65,8 @@ export default function ProfilePage() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
         body: JSON.stringify({ name, bio, avatar, phone, city, country }),
       });
       const data = await res.json();

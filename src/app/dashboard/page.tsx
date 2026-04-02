@@ -49,7 +49,7 @@ function RevenueChart({ data }: { data: { month: string; revenue: number }[] }) 
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user, token, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [orders, setOrders] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);
   const [earnings, setEarnings] = useState<any>(null);
@@ -62,29 +62,27 @@ export default function DashboardPage() {
   }, [user, authLoading, router]);
 
   useEffect(() => {
-    if (user && token) fetchDashboardData();
-  }, [user, token]);
+    if (user) fetchDashboardData();
+  }, [user]);
 
   const fetchDashboardData = async () => {
     try {
       const requests: Promise<any>[] = [
-        fetch('/api/orders', { headers: { Authorization: `Bearer ${token}` } }).then((r) =>
-          r.json()
-        ),
+        fetch('/api/orders', { credentials: 'include' }).then((r) => r.json()),
         fetch('/api/seller/services', {
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
         }).then((r) => r.json()),
       ];
 
       if (user?.role === 'SELLER' || user?.role === 'ADMIN') {
         requests.push(
           fetch('/api/seller/earnings', {
-            headers: { Authorization: `Bearer ${token}` },
+            credentials: 'include',
           }).then((r) => r.json())
         );
         requests.push(
           fetch('/api/seller/analytics', {
-            headers: { Authorization: `Bearer ${token}` },
+            credentials: 'include',
           }).then((r) => r.json())
         );
       }

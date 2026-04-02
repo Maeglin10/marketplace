@@ -54,7 +54,7 @@ function truncate(text: string, max = 80): string {
 }
 
 export function NotificationCenter() {
-  const { token } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -62,10 +62,10 @@ export function NotificationCenter() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const fetchNotifications = useCallback(async () => {
-    if (!token) return;
+    if (!user) return;
     try {
       const res = await fetch('/api/notifications?limit=10', {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
       });
       if (!res.ok) return;
       const data = await res.json();
@@ -76,19 +76,19 @@ export function NotificationCenter() {
     } catch {
       // silently fail
     }
-  }, [token]);
+  }, [user]);
 
   // Initial fetch
   useEffect(() => {
-    fetchNotifications();
-  }, [fetchNotifications]);
+    if (!authLoading) fetchNotifications();
+  }, [fetchNotifications, authLoading]);
 
   // Polling every 30 seconds
   useEffect(() => {
-    if (!token) return;
+    if (!user) return;
     const interval = setInterval(fetchNotifications, 30000);
     return () => clearInterval(interval);
-  }, [token, fetchNotifications]);
+  }, [user, fetchNotifications]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -104,12 +104,12 @@ export function NotificationCenter() {
   }, [open]);
 
   async function markAllRead() {
-    if (!token) return;
+    if (!user) return;
     setLoading(true);
     try {
       await fetch('/api/notifications', {
         method: 'PATCH',
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
       });
       setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
       setUnreadCount(0);
@@ -121,11 +121,11 @@ export function NotificationCenter() {
   }
 
   async function markOneRead(id: string) {
-    if (!token) return;
+    if (!user) return;
     try {
       await fetch(`/api/notifications/${id}`, {
         method: 'PATCH',
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
       });
       setNotifications((prev) =>
         prev.map((n) => (n.id === id ? { ...n, read: true } : n))

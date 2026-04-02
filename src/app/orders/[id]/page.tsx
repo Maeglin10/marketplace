@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Navbar } from '@/components/Navbar';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface DisputeForm {
   reason: string;
@@ -14,8 +15,8 @@ interface DisputeForm {
 export default function OrderDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
   const [order, setOrder] = useState<any>(null);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -23,24 +24,13 @@ export default function OrderDetailPage() {
   const [disputeForm, setDisputeForm] = useState<DisputeForm>({ reason: '', description: '' });
 
   useEffect(() => {
-    // Read current user id from stored JWT payload (simple decode, no verification)
-    const token = localStorage.getItem('auth-token');
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        setCurrentUserId(payload.id ?? null);
-      } catch {
-        // ignore
-      }
-    }
-    fetchOrder();
-  }, [params.id]);
+    if (!authLoading) fetchOrder();
+  }, [params.id, authLoading]);
 
   const fetchOrder = async () => {
     try {
-      const token = localStorage.getItem('auth-token');
       const res = await fetch(`/api/orders/${params.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
       });
       const data = await res.json();
       if (data.success) {
@@ -58,13 +48,12 @@ export default function OrderDetailPage() {
     setActionLoading(true);
     setActionError(null);
     try {
-      const token = localStorage.getItem('auth-token');
       const res = await fetch(`/api/orders/${params.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
         body: JSON.stringify({ status: 'CANCELLED' }),
       });
       const data = await res.json();
@@ -85,13 +74,12 @@ export default function OrderDetailPage() {
     setActionLoading(true);
     setActionError(null);
     try {
-      const token = localStorage.getItem('auth-token');
       const res = await fetch('/api/disputes', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
         body: JSON.stringify({
           orderId: order.id,
           reason: disputeForm.reason,
@@ -135,8 +123,8 @@ export default function OrderDetailPage() {
     );
   }
 
-  const isBuyer = currentUserId === order.buyerId;
-  const isSeller = currentUserId === order.sellerId;
+  const isBuyer = user?.id === order.buyerId;
+  const isSeller = user?.id === order.sellerId;
 
   const canCancel =
     (isBuyer && order.status === 'PENDING') ||

@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function FavoritesPage() {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
   const [favorites, setFavorites] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,7 +25,7 @@ export default function FavoritesPage() {
   const fetchFavorites = async () => {
     try {
       const res = await fetch('/api/favorites', {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
       });
       const data = await res.json();
       if (data.success) {
@@ -44,8 +44,8 @@ export default function FavoritesPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
         body: JSON.stringify({ serviceId }),
       });
       const data = await res.json();

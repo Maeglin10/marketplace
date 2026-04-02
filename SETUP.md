@@ -9,7 +9,7 @@
 
 ### Quick Start with Docker
 
-1. Start database and cache:
+1. Start database:
 ```bash
 docker-compose up -d
 ```
@@ -37,7 +37,6 @@ npm run db:seed
 6. Create `.env.local`:
 ```bash
 DATABASE_URL="postgresql://marketplace:dev-password@localhost:5432/marketplace"
-NEXTAUTH_SECRET="dev-secret-key-change-in-production"
 NEXTAUTH_URL="http://localhost:3000"
 
 STRIPE_SECRET_KEY="sk_test_your_test_key"
@@ -47,9 +46,6 @@ STRIPE_WEBHOOK_SECRET="whsec_your_webhook_secret"
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_your_test_key"
 
 JWT_SECRET="dev-jwt-secret-key-change-in-production"
-
-WS_URL="ws://localhost:3000"
-WS_PORT=3001
 ```
 
 7. Start development server:
@@ -85,19 +81,14 @@ psql marketplace -c "GRANT ALL PRIVILEGES ON DATABASE marketplace TO marketplace
 
 ### Core
 - `DATABASE_URL` - PostgreSQL connection string
-- `NEXTAUTH_SECRET` - Session encryption key (use `openssl rand -base64 32`)
-- `NEXTAUTH_URL` - Application URL (http://localhost:3000 for dev)
 - `JWT_SECRET` - JWT signing key
+- `NEXTAUTH_URL` - Application URL (http://localhost:3000 for dev)
 
 ### Stripe
 - `STRIPE_SECRET_KEY` - Stripe secret API key (get from stripe.com)
 - `STRIPE_PUBLISHABLE_KEY` - Stripe publishable key
 - `STRIPE_WEBHOOK_SECRET` - Webhook signing secret (from Stripe dashboard)
 - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` - Same as STRIPE_PUBLISHABLE_KEY
-
-### WebSockets (Optional for production)
-- `WS_URL` - WebSocket server URL
-- `WS_PORT` - WebSocket server port
 
 ---
 
@@ -147,7 +138,6 @@ Use the same `.env.local` structure but with production values:
 
 ```bash
 # Use strong random strings
-NEXTAUTH_SECRET=$(openssl rand -base64 32)
 JWT_SECRET=$(openssl rand -base64 32)
 
 # Production URLs

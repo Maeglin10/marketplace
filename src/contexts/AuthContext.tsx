@@ -12,7 +12,6 @@ type User = {
 
 type AuthContextType = {
   user: User | null;
-  token: string | null;
   setUser: (user: User | null) => void;
   logout: () => void;
   loading: boolean;
@@ -20,7 +19,6 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
-  token: null,
   setUser: () => {},
   logout: () => {},
   loading: true,
@@ -28,36 +26,29 @@ const AuthContext = createContext<AuthContextType>({
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem('auth-token');
-    if (storedToken) {
-      setToken(storedToken);
-      fetch('/api/auth/me', {
-        headers: { Authorization: `Bearer ${storedToken}` },
+    fetch('/api/auth/me', { credentials: 'include' })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success) setUser(data.data);
       })
-        .then((r) => r.json())
-        .then((data) => {
-          if (data.success) setUser(data.data);
-        })
-        .catch(() => {})
-        .finally(() => setLoading(false));
-    } else {
-      setLoading(false);
-    }
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
   const logout = () => {
-    localStorage.removeItem('auth-token');
-    setUser(null);
-    setToken(null);
-    window.location.href = '/';
+    fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
+      .catch(() => {})
+      .finally(() => {
+        setUser(null);
+        window.location.href = '/';
+      });
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, setUser, logout, loading }}>
+    <AuthContext.Provider value={{ user, setUser, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

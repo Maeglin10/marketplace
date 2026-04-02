@@ -10,7 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 export default function ServiceDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const [service, setService] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [contactLoading, setContactLoading] = useState(false);
@@ -57,8 +57,8 @@ export default function ServiceDetailPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
         body: JSON.stringify({ targetUserId: service.user.id }),
       });
       const data = await res.json();
@@ -80,8 +80,8 @@ export default function ServiceDetailPage() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
         body: JSON.stringify({ response: replyText }),
       });
       const data = await res.json();

@@ -81,7 +81,7 @@ marketplace/
 | **Authentication** | JWT + bcryptjs |
 | **Payments** | Stripe Connect |
 | **Validation** | Zod |
-| **Messaging** | WebSockets (ready) |
+| **Messaging** | Real-time SSE |
 | **Deployment** | Docker, Railway, Vercel |
 
 ---
@@ -116,7 +116,7 @@ marketplace/
 - Order-linked chats
 - Message history
 - Unread tracking
-- WebSocket infrastructure
+- SSE infrastructure (works without custom headers)
 
 ### ⭐ Reviews & Ratings
 - Verified reviews (completed orders only)
@@ -143,7 +143,7 @@ marketplace/
 
 ---
 
-## 🔌 API Endpoints (23 Total)
+## 🔌 API Endpoints (Core)
 
 ### Authentication (3)
 ```
@@ -344,20 +344,11 @@ Your production-ready service marketplace is **complete**. All code is:
 - **CDN**: Serve static assets via Cloudflare
 - **Horizontal Scaling**: Deploy multiple Next.js instances with load balancer
 - **Background Jobs**: Use Bull/Vitest for async operations
-- **WebSocket**: Upgrade to ws cluster for multiple servers
+- **Realtime**: Replace in-memory SSE pub/sub with Redis pub/sub for multi-instance
 
 ## Testing
 
-```bash
-# Unit tests
-npm run test
-
-# E2E tests
-npm run test:e2e
-
-# Coverage
-npm run test:coverage
-```
+Testing is not configured out of the box. If you need it, add your preferred setup (Vitest/Playwright/Jest) and scripts.
 
 ## Contributing
 

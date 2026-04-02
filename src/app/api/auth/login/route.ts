@@ -35,7 +35,11 @@ export async function POST(request: NextRequest) {
       token,
     });
 
-    response.headers.set('Set-Cookie', `auth-token=${token}; Path=/; HttpOnly; Secure; SameSite=Strict`);
+    const isProd = process.env.NODE_ENV === 'production';
+    response.headers.set(
+      'Set-Cookie',
+      `auth-token=${token}; Path=/; HttpOnly; SameSite=Lax${isProd ? '; Secure' : ''}`
+    );
 
     return response;
   } catch (error: any) {

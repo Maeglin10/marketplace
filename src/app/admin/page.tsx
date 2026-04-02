@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function AdminPage() {
-  const { user, token, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const [stats, setStats] = useState<any>(null);
   const [users, setUsers] = useState<any[]>([]);
@@ -27,8 +27,8 @@ export default function AdminPage() {
   const fetchData = async () => {
     try {
       const [statsRes, usersRes] = await Promise.all([
-        fetch('/api/admin/stats', { headers: { Authorization: `Bearer ${token}` } }),
-        fetch('/api/admin/users', { headers: { Authorization: `Bearer ${token}` } }),
+        fetch('/api/admin/stats', { credentials: 'include' }),
+        fetch('/api/admin/users', { credentials: 'include' }),
       ]);
       const [statsData, usersData] = await Promise.all([statsRes.json(), usersRes.json()]);
       if (statsData.success) setStats(statsData.data);
@@ -45,8 +45,8 @@ export default function AdminPage() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
         body: JSON.stringify({ userId, role }),
       });
       const data = await res.json();

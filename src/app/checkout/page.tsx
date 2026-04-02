@@ -73,7 +73,7 @@ function CheckoutForm({ orderId, amount }: { orderId: string; amount: number }) 
 function CheckoutPageInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { user, token, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const serviceId = searchParams.get('serviceId');
   const sellerId = searchParams.get('sellerId');
   const [clientSecret, setClientSecret] = useState('');
@@ -97,8 +97,8 @@ function CheckoutPageInner() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
+      credentials: 'include',
       body: JSON.stringify({ serviceId, sellerId, quantity: 1 }),
     })
       .then((r) => r.json())
@@ -113,7 +113,7 @@ function CheckoutPageInner() {
       })
       .catch(() => setError('Network error. Please try again.'))
       .finally(() => setLoading(false));
-  }, [serviceId, sellerId, user, authLoading, token]);
+  }, [serviceId, sellerId, user, authLoading]);
 
   if (authLoading || loading) {
     return (

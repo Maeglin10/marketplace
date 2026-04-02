@@ -34,7 +34,6 @@ export default function LoginPage() {
         return;
       }
 
-      localStorage.setItem('auth-token', data.data.token);
       router.push('/dashboard');
     } catch (err: any) {
       setError(err.message || 'An error occurred');

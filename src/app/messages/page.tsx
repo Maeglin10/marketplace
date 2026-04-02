@@ -9,7 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export default function MessagesPage() {
   const router = useRouter();
-  const { user, token, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [conversations, setConversations] = useState<any[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<any>(null);
   const [messages, setMessages] = useState<any[]>([]);
@@ -23,18 +23,18 @@ export default function MessagesPage() {
   }, [user, authLoading, router]);
 
   useEffect(() => {
-    if (user && token) fetchConversations();
-  }, [user, token]);
+    if (user) fetchConversations();
+  }, [user]);
 
   useEffect(() => {
-    if (selectedConversation && token) {
+    if (selectedConversation) {
       fetchMessages(selectedConversation.id);
       subscribeSSE(selectedConversation.id);
     }
     return () => {
       eventSourceRef.current?.close();
     };
-  }, [selectedConversation?.id, token]);
+  }, [selectedConversation?.id]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -43,7 +43,7 @@ export default function MessagesPage() {
   const fetchConversations = async () => {
     try {
       const res = await fetch('/api/conversations', {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
       });
       const data = await res.json();
       if (data.success) {
@@ -62,7 +62,7 @@ export default function MessagesPage() {
   const fetchMessages = async (conversationId: string) => {
     try {
       const res = await fetch(`/api/conversations/${conversationId}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
       });
       const data = await res.json();
       if (data.success) setMessages(data.data.messages);
@@ -73,9 +73,9 @@ export default function MessagesPage() {
 
   const subscribeSSE = (conversationId: string) => {
     eventSourceRef.current?.close();
-    const es = new EventSource(
-      `/api/messages/sse?token=${encodeURIComponent(token!)}&conversationId=${conversationId}`
-    );
+    const es = new EventSource(`/api/messages/sse?conversationId=${conversationId}`, {
+      withCredentials: true,
+    });
     es.onmessage = (e) => {
       if (!e.data || e.data.startsWith(':')) return;
       try {
@@ -102,9 +102,9 @@ export default function MessagesPage() {
       const res = await fetch(`/api/conversations/${selectedConversation.id}`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ content }),
       });
       const data = await res.json();
