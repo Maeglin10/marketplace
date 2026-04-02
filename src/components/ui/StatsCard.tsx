@@ -6,17 +6,20 @@ interface StatsCardProps {
   value: string | number;
   icon?: React.ReactNode;
   trend?: number; // positive = up, negative = down, percentage
+  description?: string;
   className?: string;
 }
 
-export function StatsCard({ label, value, icon, trend, className }: StatsCardProps) {
+export function StatsCard({ label, value, icon, trend, description, className }: StatsCardProps) {
   const hasTrend = trend !== undefined && trend !== null;
   const isPositive = hasTrend && trend >= 0;
 
   return (
     <div
       className={cn(
-        'rounded-lg border border-gray-200 bg-white p-5 flex flex-col gap-3 dark:bg-gray-900 dark:border-gray-700',
+        'rounded-xl border border-gray-200 bg-white p-5 flex flex-col gap-3',
+        'dark:bg-gray-900 dark:border-gray-800',
+        'hover:shadow-md transition-shadow duration-200',
         className
       )}
     >
@@ -62,10 +65,15 @@ export function StatsCard({ label, value, icon, trend, className }: StatsCardPro
         )}
       </div>
 
-      {/* Value */}
+      {/* Value + label */}
       <div>
-        <p className="text-3xl font-bold text-gray-900 dark:text-white leading-none">{value}</p>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{label}</p>
+        <p className="text-3xl font-bold text-gray-900 dark:text-white leading-none tabular-nums">
+          {value}
+        </p>
+        <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mt-1">{label}</p>
+        {description && (
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{description}</p>
+        )}
       </div>
     </div>
   );

@@ -10,6 +10,8 @@ interface AvatarProps {
   src?: string;
   size?: AvatarSize;
   className?: string;
+  /** Optional ring border around the avatar */
+  ring?: boolean;
 }
 
 /** Deterministic colour palette derived from the name hash */
@@ -26,7 +28,7 @@ const PALETTE = [
   'bg-teal-500',
   'bg-emerald-500',
   'bg-green-500',
-  'bg-lime-500',
+  'bg-lime-600',
   'bg-yellow-500',
   'bg-amber-500',
   'bg-orange-500',
@@ -55,7 +57,7 @@ const SIZE_CLASSES: Record<AvatarSize, { wrapper: string; text: string }> = {
   xl: { wrapper: 'w-20 h-20', text: 'text-2xl' },
 };
 
-export function Avatar({ name, src, size = 'md', className }: AvatarProps) {
+export function Avatar({ name, src, size = 'md', className, ring = false }: AvatarProps) {
   const [imgError, setImgError] = useState(false);
 
   const { wrapper, text } = SIZE_CLASSES[size];
@@ -69,6 +71,7 @@ export function Avatar({ name, src, size = 'md', className }: AvatarProps) {
         'relative inline-flex shrink-0 items-center justify-center rounded-full overflow-hidden select-none',
         wrapper,
         !showImage && colorClass,
+        ring && 'ring-2 ring-white dark:ring-gray-900 ring-offset-0',
         className
       )}
       title={name}
