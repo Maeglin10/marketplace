@@ -30,6 +30,10 @@ RUN npm ci --only=production && npm cache clean --force
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 
+# Copy start script
+COPY start.sh ./start.sh
+RUN chmod +x ./start.sh
+
 # Generate Prisma client
 RUN npx prisma generate
 
@@ -37,8 +41,8 @@ RUN npx prisma generate
 EXPOSE 3000
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=3s --start-period=30s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3000', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
 
-# Start application
-CMD ["npm", "start"]
+# Run migrations then start
+CMD ["./start.sh"]
