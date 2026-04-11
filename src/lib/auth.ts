@@ -4,26 +4,22 @@ import { NextRequest } from 'next/server';
 import { JWT_EXPIRY } from '@/config/constants';
 import { AuthToken } from '@/types';
 
-const JWT_SECRET =
-  process.env.JWT_SECRET ||
-  (process.env.NODE_ENV === 'production'
-    ? undefined
-    : 'dev-secret-key-change-in-production');
-
-if (!JWT_SECRET) {
-  throw new Error('JWT_SECRET is required in production');
+function getSecret(): string {
+  const secret =
+    process.env.JWT_SECRET ??
+    (process.env.NODE_ENV === 'production' ? undefined : 'dev-secret-key-change-in-production');
+  if (!secret) throw new Error('JWT_SECRET is required in production');
+  return secret;
 }
 
 export const createToken = (payload: AuthToken): string => {
-  return jwt.sign(payload, JWT_SECRET, {
-    expiresIn: JWT_EXPIRY,
-  });
+  return jwt.sign(payload, getSecret(), { expiresIn: JWT_EXPIRY });
 };
 
 export const verifyToken = (token: string): AuthToken | null => {
   try {
-    return jwt.verify(token, JWT_SECRET) as AuthToken;
-  } catch (error) {
+    return jwt.verify(token, getSecret()) as AuthToken;
+  } catch {
     return null;
   }
 };
@@ -38,11 +34,12 @@ export const comparePasswords = async (password: string, hash: string): Promise<
 
 export const extractTokenFromCookie = (cookieString?: string): string | null => {
   if (!cookieString) return null;
-  const token = cookieString
-    .split('; ')
-    .find((row) => row.startsWith('auth-token='))
-    ?.substring('auth-token='.length);
-  return token || null;
+  return (
+    cookieString
+      .split('; ')
+      .find((row) => row.startsWith('auth-token='))
+      ?.substring('auth-token='.length) ?? null
+  );
 };
 
 export const extractTokenFromHeader = (authHeader?: string): string | null => {
@@ -51,25 +48,15 @@ export const extractTokenFromHeader = (authHeader?: string): string | null => {
 };
 
 export const requireAuth = (request: NextRequest): AuthToken | null => {
-  const headerToken = extractTokenFromHeader(
-    request.headers.get('authorization') ?? undefined
-  );
-  const cookieToken = extractTokenFromCookie(
-    request.headers.get('cookie') ?? undefined
-  );
-
+  const headerToken = extractTokenFromHeader(request.headers.get('authorization') ?? undefined);
+  const cookieToken = extractTokenFromCookie(request.headers.get('cookie') ?? undefined);
   const token = headerToken || cookieToken;
   if (!token) return null;
-
   return verifyToken(token);
 };
 
 export const requireRole = (request: NextRequest, allowedRoles: string[]): AuthToken | null => {
   const auth = requireAuth(request);
-  
-  if (!auth || !allowedRoles.includes(auth.role)) {
-    return null;
-  }
-
+  if (!auth || !allowedRoles.includes(auth.role)) return null;
   return auth;
 };
