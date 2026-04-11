@@ -109,20 +109,6 @@ export function Navbar() {
         </div>
       </nav>
 
-      {/* Footer légal — visible sur toutes les pages via la Navbar */}
-      <footer className="mt-auto border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-sm text-gray-400 dark:text-gray-500">
-          <p>© {new Date().getFullYear()} {APP_CONFIG.name}. Tous droits réservés.</p>
-          <div className="flex gap-6">
-            <Link href="/cgu" className="hover:text-black dark:hover:text-white transition-colors">
-              CGU
-            </Link>
-            <Link href="/privacy" className="hover:text-black dark:hover:text-white transition-colors">
-              Confidentialité
-            </Link>
-          </div>
-        </div>
-      </footer>
     </>
   );
 }
