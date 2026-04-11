@@ -282,3 +282,15 @@ enum NotificationType {
   DISPUTE_UPDATE
   PAYMENT_RECEIVED
 }
+
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
