@@ -1,8 +1,14 @@
+import type { Metadata } from 'next';
 import { Navbar } from '@/components/Navbar';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
 import { APP_CONFIG } from '@/config/app';
 import { Shield, MessageCircle, Star } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'ServiceHub — Find Top Freelance Services & Talent',
+  description: 'Browse 1,200+ freelance services across design, development, marketing, and more. Hire verified professionals with secure payments.',
+};
 
 const featuredServices = [
   {
@@ -46,7 +52,7 @@ const stats = [
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-white dark:bg-gray-900">
+    <main id="main-content" className="min-h-screen bg-white dark:bg-gray-900">
       <Navbar />
 
       {/* Hero */}
@@ -60,7 +66,7 @@ export default function Home() {
               Connect with talented service providers or offer your expertise to a global audience.
               Our secure marketplace makes it easy to find, hire, and deliver quality services.
             </p>
-            <p className="text-base text-gray-500 dark:text-gray-500 max-w-xl mx-auto animate-slide-up animation-delay-300">
+            <p className="text-base text-gray-600 dark:text-gray-400 max-w-xl mx-auto animate-slide-up animation-delay-300">
               Trusted by thousands of buyers and sellers worldwide — get started today.
             </p>
 
@@ -251,7 +257,7 @@ export default function Home() {
               <ul className="space-y-2 text-sm text-gray-400">
                 <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
                 <li><Link href="/cgu" className="hover:text-white transition-colors">Terms of Service</Link></li>
-                <li><Link href="/cookies" className="hover:text-white transition-colors">Cookie Policy</Link></li>
+                <li><Link href="/privacy" className="hover:text-white transition-colors">Cookie Policy</Link></li>
               </ul>
             </div>
           </div>

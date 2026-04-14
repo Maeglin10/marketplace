@@ -1,48 +1,44 @@
-import { MetadataRoute } from 'next'
+import type { MetadataRoute } from 'next';
+
+const BASE = 'https://aevia-skymarket.vercel.app';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: 'https://aevia-market.vercel.app',
+      url: BASE,
       lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1,
+      changeFrequency: 'weekly',
+      priority: 1.0,
     },
     {
-      url: 'https://aevia-market.vercel.app/services',
+      url: `${BASE}/services`,
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.9,
     },
     {
-      url: 'https://aevia-market.vercel.app/pricing',
+      url: `${BASE}/auth/login`,
       lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
+      changeFrequency: 'yearly',
+      priority: 0.5,
     },
     {
-      url: 'https://aevia-market.vercel.app/seller/onboard',
+      url: `${BASE}/auth/register`,
       lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
+      changeFrequency: 'yearly',
+      priority: 0.6,
     },
     {
-      url: 'https://aevia-market.vercel.app/auth/register',
+      url: `${BASE}/privacy`,
       lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.7,
+      changeFrequency: 'yearly',
+      priority: 0.3,
     },
     {
-      url: 'https://aevia-market.vercel.app/privacy',
+      url: `${BASE}/cgu`,
       lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.4,
+      changeFrequency: 'yearly',
+      priority: 0.3,
     },
-    {
-      url: 'https://aevia-market.vercel.app/cgu',
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.4,
-    },
-  ]
+  ];
 }

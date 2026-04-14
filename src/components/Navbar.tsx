@@ -68,7 +68,13 @@ export function Navbar() {
               )}
             </div>
 
-            <button className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
+            <button
+              className="md:hidden min-h-[44px] min-w-[44px] flex items-center justify-center"
+              onClick={() => setIsOpen(!isOpen)}
+              aria-label="Toggle navigation menu"
+              aria-expanded={isOpen}
+              aria-controls="mobile-menu"
+            >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
@@ -76,7 +82,7 @@ export function Navbar() {
           </div>
 
           {isOpen && (
-            <div className="md:hidden pb-4 space-y-2">
+            <div id="mobile-menu" className="md:hidden pb-4 space-y-2">
               <Link href="/services" className="block text-gray-600 hover:text-black py-2">
                 Browse Services
               </Link>

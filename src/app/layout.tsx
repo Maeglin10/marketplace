@@ -3,86 +3,37 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ThemeProvider } from '@/components/ThemeProvider';
-import { Footer } from '@/components/Footer';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://aevia-market.vercel.app"),
+  metadataBase: new URL('https://aevia-skymarket.vercel.app'),
   title: {
-    default: "AeviaMarket — Freelance Services Marketplace",
-    template: "%s | AeviaMarket",
+    default: 'ServiceHub — Find Top Freelance Services & Talent',
+    template: '%s | ServiceHub',
   },
-  description:
-    "AeviaMarket is a secure freelance services marketplace. Find top talent for design, development, and marketing. Protected payments via Stripe, real-time chat, and verified reviews.",
-  keywords: [
-    "freelance marketplace",
-    "AeviaMarket",
-    "hire freelancers",
-    "design services",
-    "web development freelance",
-    "secure payments Stripe",
-    "service marketplace",
-    "Valentin Milliand",
-  ],
-  authors: [{ name: "Valentin Milliand", url: "https://valentin-milliand.vercel.app" }],
-  creator: "Valentin Milliand",
+  description: 'Connect with verified freelance professionals for design, development, marketing, and more. Secure payments, real reviews, and instant messaging. Start hiring today.',
+  keywords: ['freelance marketplace', 'hire freelancers', 'services marketplace', 'logo design', 'web development', 'SEO services', 'ServiceHub'],
+  authors: [{ name: 'Valentin Milliand' }],
+  creator: 'Valentin Milliand',
   openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: "https://aevia-market.vercel.app",
-    siteName: "AeviaMarket",
-    title: "AeviaMarket — Freelance Services Marketplace",
-    description:
-      "Secure freelance marketplace with Stripe-protected payments, real-time chat, and verified reviews. Find top talent fast.",
-    images: [
-      {
-        url: "/og.png",
-        width: 1200,
-        height: 630,
-        alt: "AeviaMarket — Freelance Services Marketplace",
-      },
-    ],
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://aevia-skymarket.vercel.app',
+    siteName: 'ServiceHub',
+    title: 'ServiceHub — Find Top Freelance Services & Talent',
+    description: 'Connect with verified freelance professionals. Secure payments, real reviews, instant messaging.',
+    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'ServiceHub — Freelance Marketplace' }],
   },
   twitter: {
-    card: "summary_large_image",
-    title: "AeviaMarket — Freelance Services Marketplace",
-    description:
-      "Secure freelance marketplace with Stripe-protected payments, real-time chat, and verified reviews.",
-    images: ["/og.png"],
-    creator: "@valentinmilliand",
+    card: 'summary_large_image',
+    title: 'ServiceHub — Find Top Freelance Services',
+    description: 'Connect with verified freelance professionals. Secure payments, real reviews.',
+    images: ['/og.png'],
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: { index: true, follow: true },
-  },
-  alternates: {
-    canonical: "https://aevia-market.vercel.app",
-  },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
+  alternates: { canonical: 'https://aevia-skymarket.vercel.app' },
 };
-
-const webAppSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'WebApplication',
-  name: 'AeviaMarket',
-  url: 'https://aevia-market.vercel.app',
-  applicationCategory: 'BusinessApplication',
-  operatingSystem: 'All',
-  description:
-    'Secure freelance services marketplace. Find top talent for design, development, and marketing with Stripe-protected payments and verified reviews.',
-  offers: {
-    '@type': 'Offer',
-    price: '0',
-    priceCurrency: 'USD',
-    description: 'Free to join. Platform fee applies per transaction.',
-  },
-  author: {
-    '@type': 'Person',
-    name: 'Valentin Milliand',
-    url: 'https://valentin-milliand.vercel.app',
-  },
-}
 
 export default function RootLayout({
   children,
@@ -92,19 +43,19 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppSchema) }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'Organization',
+          'name': 'ServiceHub',
+          'url': 'https://aevia-skymarket.vercel.app',
+          'description': 'A production-ready freelance service marketplace platform.',
+          'author': { '@type': 'Person', 'name': 'Valentin Milliand' }
+        }) }} />
       </head>
-      <body className={`${inter.className} flex flex-col min-h-screen`}>
+      <body className={inter.className}>
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-lg focus:font-semibold">Skip to main content</a>
         <ThemeProvider>
-          <AuthProvider>
-            <div className="flex flex-col min-h-screen">
-              {children}
-              <Footer />
-            </div>
-          </AuthProvider>
+          <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>
       </body>
     </html>

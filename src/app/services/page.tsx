@@ -1,11 +1,18 @@
 'use client';
 
+import type { Metadata } from 'next';
 import { useEffect, useState } from 'react';
 import { Navbar } from '@/components/Navbar';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Form';
 import { ServiceCardSkeleton } from '@/components/ServiceCardSkeleton';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Browse Services — ServiceHub',
+  description: 'Find the perfect freelance service from 1,200+ listings across design, development, marketing, writing, and more.',
+  alternates: { canonical: 'https://aevia-skymarket.vercel.app/services' },
+};
 
 type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'rating';
 
@@ -82,8 +89,9 @@ export default function ServicesPage() {
           <div className="md:col-span-1 space-y-6">
             <Card>
               <CardContent className="pt-6">
-                <h3 className="font-semibold mb-4">Search</h3>
+                <label htmlFor="service-search" className="font-semibold mb-4 block">Search</label>
                 <Input
+                  id="service-search"
                   placeholder="Search services..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
@@ -93,8 +101,9 @@ export default function ServicesPage() {
 
             <Card>
               <CardContent className="pt-6">
-                <h3 className="font-semibold mb-4">Category</h3>
+                <label htmlFor="category-select" className="font-semibold mb-4 block">Category</label>
                 <select
+                  id="category-select"
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
                   className="w-full border border-gray-300 rounded-md px-3 py-2"
